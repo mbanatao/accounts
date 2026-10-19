@@ -6,12 +6,20 @@ The directory contains UnionBank, BPI, EastWest, Tonik, MariBank, GCash, Maya an
 
 ## Receipt and delivery submission
 
-Open a payment QR, enter the receiver's full name, mobile number, complete delivery address and special instructions in the per-account details field, attach the receipt, and choose **Submit details & receipt to Mark**. The current implementation submits the details and file attachments through FormSubmit using a multipart form; the form is limited to 9 MB total attachment size and requires at least one receipt. Saved notes and receipt files are local to that browser until submitted.
+Open a payment account, enter the receiver's full name, mobile number, complete delivery address, and any optional special instructions, then attach a payment receipt and choose **Submit**. The site sends the submission through its own Vercel serverless endpoint to Resend, which emails the details and receipt attachments to the configured owner inbox. No FormSubmit redirect or CAPTCHA page is used.
 
-**Activation required:** FormSubmit may send a one-time activation email to the destination inbox on the first submission. The owner must confirm that email before normal delivery works. FormSubmit is a third-party service and processes submitted delivery details and receipts. Its documentation says it retains submission data for 30 days; uploaded files are not retained in its archive after the email is sent. The email target is configured in the public static HTML/JavaScript source, so it is visible to anyone who inspects the page.
+The form requires the receiver name, mobile number, complete delivery address, and at least one receipt. Special instructions are optional. Up to five JPG, PNG, WebP, or PDF files are accepted, with a combined attachment limit of 2.8 MB to stay within the serverless request limit. Files and draft details are stored in the customer's browser until submission; they are sent only when the customer presses Submit.
 
-The project is deployed directly to Vercel. GitHub commits do not automatically trigger deployment because this Vercel project is not Git-connected; deploy the static files again after future source changes.
+## Deployment configuration
+
+The Vercel project uses these environment variables, configured in Vercel (never commit secrets):
+
+- `RESEND_API_KEY`: sending-only Resend API key.
+- `RESEND_FROM`: approved sender address (currently `onboarding@resend.dev`).
+- `MARKPAY_RECIPIENT`: destination inbox.
+
+The production deployment is uploaded directly to Vercel; GitHub commits do not automatically trigger deployments because this Vercel project is not Git-connected. Deploy both `index.html` and `api/submit.js` after source changes. After setting or rotating environment variables, create a fresh deployment.
 
 ## Privacy
 
-The repository and website are public. `noindex,nofollow` only discourages search-engine indexing and is not access control. Customers should verify account details before payment and must never share passwords or OTPs.
+The repository and website are public. `noindex,nofollow` only discourages search-engine indexing and is not access control. Customers should verify account details before payment and must never share passwords or OTPs. Submitted receipt images and delivery details are emailed to the configured recipient; do not include unrelated sensitive information.
