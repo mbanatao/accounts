@@ -1,6 +1,6 @@
 # Accounts — Payment Directory
 
-A responsive static site containing the owner's bank and digital-wallet QR profiles, manual transfer details, account-specific notes, and receipt attachments.
+A responsive static site for the owner's eight bank and digital-wallet QR profiles.
 
 ## Profiles
 - UnionBank
@@ -11,13 +11,20 @@ A responsive static site containing the owner's bank and digital-wallet QR profi
 - GCash
 - Maya
 - GoTyme
-- BDO — account number 007336002118; the supplied QR is a temporary merchant-payment code and is clearly labelled as a snapshot, not a reusable receiving QR.
 
-The QR payloads were decoded from the supplied screenshots and CRC-validated before rendering in the browser. The BDO screenshot is a dynamic merchant QR with an on-screen validity countdown. The site warns users not to treat it as a reusable receiving code and disables downloading that snapshot.
+BDO has been removed from the directory, including its temporary merchant-payment QR.
 
-## Account notes and receipt attachments
+## Logos and customer instructions
 
-Each account opens its own **Additional details** field and receipt list. Notes are saved in browser local storage, and receipt files are saved in IndexedDB in that browser on that device. Accepted receipt types are JPG/JPEG, PNG, WebP and PDF; maximum five files per account, 10 MB per file. Files can be opened, saved/downloaded, or removed. Receipt data is not uploaded to the website or synchronized between devices. Clearing browser site data may remove these local records.
+Account cards and QR dialogs use bank/wallet logo images, with a fallback mark if an image host is unavailable. Wikimedia Commons logo assets are used where available; official website favicons are used for other brands.
+
+The hero and order checklist instruct the payer to attach the payment receipt and provide the receiver's full name, full delivery address, mobile number, and any special instructions.
+
+## Additional details and receipts
+
+Each account has a separate delivery details/special instructions note and receipt attachment list. Notes are saved in browser local storage; receipt files are stored in IndexedDB on the same device. Accepted files: JPG/JPEG, PNG, WebP and PDF. Limits: five files per account, 10 MB each. Files can be opened, downloaded, or removed.
+
+**These records are local to the browser and are not submitted to the account owner or synchronized across devices.** Clearing browser site data may remove them. Customers must send the receipt and details through the owner's existing contact channel. To accept online submissions directly into the owner's account, the site needs an authenticated upload/form backend and a destination such as a verified email, WhatsApp flow, or database; none is configured here.
 
 ## Deployment
 
@@ -27,6 +34,4 @@ This is a direct static deployment under the alternate connected Vercel account 
 
 ## Privacy and QR safety
 
-The repository and website are public. The `noindex,nofollow` tag only discourages search-engine indexing and does not restrict access. Anyone who knows the URL or can read the source can view account details and scan the QR codes.
-
-Senders should verify the recipient and amount in their own bank/wallet app before authorizing payment. Never share passwords or OTPs to receive a transfer.
+The repository and website are public. The `noindex,nofollow` tag only discourages search-engine indexing and does not restrict access. Anyone with access to the URL or source can view the account numbers and QR codes. Customers should verify the recipient and amount before confirming payment, and never share passwords or OTPs.
