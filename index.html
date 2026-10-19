@@ -144,7 +144,7 @@
 Delivery address:
 Mobile number:
 Special instructions:"></textarea><p class="local-hint">Enter the receiver’s full name, mobile number, and delivery address on separate lines; add special instructions below. Details stay on this device until you submit them.</p></section>
-      <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Attach receipt</h3><span class="panel-tag">Up to 5 files · 10 MB each</span></div><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipts stay on this device until submission. Up to 10 MB total can be emailed with the order.</p></section>
+      <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Attach receipt</h3><span class="panel-tag">Up to 5 local files · 9 MB total per email</span></div><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipts stay on this device until submission. Up to 10 MB total can be emailed with the order.</p></section>
       <button id="submit-details-button" class="submit-details-button" type="button">Submit details &amp; receipt to Mark</button><p class="submit-consent">By submitting, you authorize the receipt and delivery details to be emailed to Mark Johnson via FormSubmit. First-time activation may be required before notifications are delivered.</p>
       <div class="status-line" id="modal-status" role="status" aria-live="polite"></div>
     </div>
@@ -421,11 +421,15 @@ Special instructions:"></textarea><p class="local-hint">Enter the receiver’s f
         if(receipts.length === 0){
           setStatus("Attach at least one payment receipt before submitting.");
           document.getElementById("receipt-input").focus();
+          this.disabled = false;
+          this.textContent = "Submit details & receipt to Mark";
           return;
         }
         const totalBytes = receipts.reduce(function(sum,r){return sum + r.size;},0);
         if(totalBytes > 9*1024*1024){
           setStatus("The total receipt size must be under 9 MB to email reliably. Remove or shrink one or more files.");
+          this.disabled = false;
+          this.textContent = "Submit details & receipt to Mark";
           return;
         }
         const form = document.createElement("form");
