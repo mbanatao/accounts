@@ -148,7 +148,7 @@
         <div><label class="field-label" for="special-instructions">Special instructions <span class="optional-mark">(optional)</span></label><textarea class="guided-field" id="special-instructions" name="special-instructions" maxlength="1000" rows="3" placeholder="Landmark, preferred delivery time, or other notes"></textarea></div>
       </div><p class="local-hint">Your details are saved on this device while you fill in the form. They will be sent with your receipt when you submit.</p><div id="details-validation" class="validation-summary" role="alert" aria-live="polite"></div></section>
       <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Payment receipt <span class="required-mark">*</span></h3><span class="panel-tag">Required · up to 5 files</span></div><p class="receipt-required">Choose a screenshot or PDF showing your completed payment. Total file size must be under 9 MB.</p><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipts stay on this device until submission. Up to 10 MB total can be emailed with the order.</p></section>
-      <button id="submit-details-button" class="submit-details-button" type="button">Submit</button><p class="submit-consent">By submitting, you authorize the receipt and delivery details to be emailed to Mark Johnson via FormSubmit. First-time activation may be required before notifications are delivered.</p>
+      <button id="submit-details-button" class="submit-details-button" type="button">Submit</button><p class="submit-consent">By submitting, you authorize the receipt and delivery details to be emailed to Mark Johnson securely by email. You will see a confirmation here after the submission is accepted.</p>
       <div class="status-line" id="modal-status" role="status" aria-live="polite"></div>
     </div>
   </dialog>
@@ -489,43 +489,36 @@
         if(totalBytes > 9*1024*1024){
           setStatus("Your receipt files are too large to email. Please keep the combined size under 9 MB, then submit again.");
           this.disabled = false;
-          this.textContent = "Submit details & receipt to Mark";
+          this.textContent = "Submit";
           return;
         }
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "https://formsubmit.co/markjohnsonbanatao888@gmail.com";
-        form.enctype = "multipart/form-data";
-        form.style.display = "none";
-        function addField(name,value){
-          const input=document.createElement("input");
-          input.type="hidden";input.name=name;input.value=value;
-          form.appendChild(input);
-        }
-        addField("_subject","Payment receipt and delivery details — " + activeAccount.name);
-        addField("_next","https://maccounts.vercel.app/thanks.html");
-        addField("_template","table");
-        addField("_honey","");
-        addField("Payment account",activeAccount.name);
-        addField("Account number",activeAccount.number || "");
-        addField("Receiver and delivery details",rawDetails);
-        addField("Submitted at",new Date().toLocaleString());
+        const formData = new FormData();
+        formData.append("_subject","Payment receipt and delivery details — " + activeAccount.name);
+        formData.append("_template","table");
+        formData.append("_captcha","false");
+        formData.append("_honey","");
+        formData.append("Payment account",activeAccount.name);
+        formData.append("Account number",activeAccount.number || "");
+        formData.append("Receiver and delivery details",rawDetails);
+        formData.append("Submitted at",new Date().toLocaleString());
         receipts.forEach(function(receipt,index){
-          const fileInput=document.createElement("input");
-          fileInput.type="file";
-          fileInput.name="receipt_" + (index+1);
-          const transfer=new DataTransfer();
-          transfer.items.add(new File([receipt.blob],receipt.name,{type:receipt.type || "application/octet-stream"}));
-          fileInput.files=transfer.files;
-          form.appendChild(fileInput);
+          formData.append("receipt_" + (index+1),new File([receipt.blob],receipt.name,{type:receipt.type || "application/octet-stream"}),receipt.name);
         });
-        document.body.appendChild(form);
-        setStatus("Opening secure submission handoff…");
-        form.submit();
-      }catch(e){
-        setStatus("Could not prepare the email. Please retry after checking the attached receipt files.");
-        this.disabled = false;
-        this.textContent = "Submit details & receipt to Mark";
+        setStatus("Submitting your details and receipt…");
+        const response = await fetch("https://formsubmit.co/ajax/markjohnsonbanatao888@gmail.com",{
+          method:"POST",
+          body:formData,
+          headers:{"Accept":"application/json"}
+        });
+        let result = {};
+        try{ result = await response.json(); }catch(parseError){}
+        if(!response.ok || result.success === "false" || result.success === false){
+          throw new Error(result.message || "The email service could not accept the submission.");
+        }
+        setStatus("Submitted successfully. Your delivery details and receipt have been sent.");
+        document.getElementById("submit-details-button").textContent = "Submitted";
+        document.getElementById("submit-details-button").disabled = true;
+        return;
       }
     });
     dialog.addEventListener("close",function(){
