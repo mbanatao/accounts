@@ -146,9 +146,9 @@
         <div><label class="field-label" for="delivery-address">Complete delivery address <span class="required-mark">*</span></label><textarea class="guided-field" id="delivery-address" name="delivery-address" autocomplete="street-address" maxlength="500" rows="3" placeholder="House/building, street, barangay, city, province, ZIP code" required aria-describedby="delivery-address-error"></textarea><p class="field-error" id="delivery-address-error"></p></div>
         <div><label class="field-label" for="receiver-mobile">Receiver’s mobile number <span class="required-mark">*</span></label><input class="guided-field" id="receiver-mobile" name="receiver-mobile" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="e.g. 09XX XXX XXXX" required aria-describedby="receiver-mobile-error"><p class="field-error" id="receiver-mobile-error"></p></div>
         <div><label class="field-label" for="special-instructions">Special instructions <span class="optional-mark">(optional)</span></label><textarea class="guided-field" id="special-instructions" name="special-instructions" maxlength="1000" rows="3" placeholder="Landmark, preferred delivery time, or other notes"></textarea></div>
-      </div><p class="local-hint">Your details are saved on this device while you fill in the form. They will be sent with your receipt when you submit.</p><div id="details-validation" class="validation-summary" role="alert" aria-live="polite"></div></section>
-      <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Payment receipt <span class="required-mark">*</span></h3><span class="panel-tag">Required · up to 5 files</span></div><p class="receipt-required">Choose a screenshot or PDF showing your completed payment. Total file size must be under 9 MB.</p><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipts stay on this device until submission. Up to 10 MB total can be emailed with the order.</p></section>
-      <button id="submit-details-button" class="submit-details-button" type="button">Submit</button><p class="submit-consent">By submitting, you authorize the receipt and delivery details to be emailed to Mark Johnson securely by email. You will see a confirmation here after the submission is accepted.</p>
+      </div><p class="local-hint">Your details stay on this device while you fill in the form, then are emailed with your receipt when you submit.</p><div id="details-validation" class="validation-summary" role="alert" aria-live="polite"></div></section>
+      <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Payment receipt <span class="required-mark">*</span></h3><span class="panel-tag">Required · up to 5 files</span></div><p class="receipt-required">Choose a screenshot or PDF showing your completed payment. Total file size must be under 2.8 MB.</p><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipts stay on this device until submission. Up to 2.8 MB total can be sent with your order.</p></section>
+      <button id="submit-details-button" class="submit-details-button" type="button">Submit</button><p class="submit-consent">Your receipt and delivery details will be emailed to Mark. Your information is sent only when you press Submit.</p>
       <div class="status-line" id="modal-status" role="status" aria-live="polite"></div>
     </div>
   </dialog>
@@ -446,7 +446,18 @@
         saveDeliveryDetails();
       });
     });
+    async function blobToBase64(blob){
+      const buffer = await blob.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      const chunkSize = 0x8000;
+      for(let offset=0;offset<bytes.length;offset+=chunkSize){
+        binary += String.fromCharCode.apply(null,bytes.subarray(offset,Math.min(offset+chunkSize,bytes.length)));
+      }
+      return btoa(binary);
+    }
     document.getElementById("submit-details-button").addEventListener("click",async function(){
+      const button = this;
       if(!activeAccount){setStatus("Choose a payment account first.");return;}
       const missing = [];
       requiredFields.forEach(function(field){
@@ -463,62 +474,67 @@
       });
       const validation = document.getElementById("details-validation");
       if(missing.length){
-        validation.textContent="Please complete " + missing.map(function(field){return field.label;}).join(", ") + " before submitting.";
+        validation.textContent="Please fill in the highlighted fields before submitting.";
         validation.classList.add("show");
-        setStatus("A few required details are still missing.");
+        setStatus("Complete the highlighted details, then submit again.");
         document.getElementById(missing[0].id).focus();
         return;
       }
       validation.classList.remove("show");
       validation.textContent="";
       saveDeliveryDetails();
-      const rawDetails = collectDeliveryDetails();
-      this.disabled = true;
-      this.textContent = "Preparing submission…";
+      button.disabled = true;
+      button.textContent = "Sending…";
       try{
         const receipts = await getReceipts(activeAccount.id);
         if(receipts.length === 0){
-          setStatus("Please attach your payment receipt before submitting.");
+          setStatus("Add a screenshot or PDF of your completed payment first.");
           document.getElementById("receipt-heading").scrollIntoView({behavior:"smooth",block:"center"});
           document.getElementById("receipt-input").focus();
-          this.disabled = false;
-          this.textContent = "Submit";
           return;
         }
         const totalBytes = receipts.reduce(function(sum,r){return sum + r.size;},0);
-        if(totalBytes > 9*1024*1024){
-          setStatus("Your receipt files are too large to email. Please keep the combined size under 9 MB, then submit again.");
-          this.disabled = false;
-          this.textContent = "Submit";
+        if(totalBytes > 2.8*1024*1024){
+          setStatus("Your receipts are too large. Please keep all files together under 2.8 MB and try again.");
+          document.getElementById("receipt-heading").scrollIntoView({behavior:"smooth",block:"center"});
           return;
         }
-        const formData = new FormData();
-        formData.append("_subject","Payment receipt and delivery details — " + activeAccount.name);
-        formData.append("_template","table");
-        formData.append("_captcha","false");
-        formData.append("_honey","");
-        formData.append("Payment account",activeAccount.name);
-        formData.append("Account number",activeAccount.number || "");
-        formData.append("Receiver and delivery details",rawDetails);
-        formData.append("Submitted at",new Date().toLocaleString());
-        receipts.forEach(function(receipt,index){
-          formData.append("receipt_" + (index+1),new File([receipt.blob],receipt.name,{type:receipt.type || "application/octet-stream"}),receipt.name);
-        });
-        setStatus("Submitting your details and receipt…");
-        const response = await fetch("https://formsubmit.co/ajax/markjohnsonbanatao888@gmail.com",{
+        const attachments = [];
+        for(const receipt of receipts){
+          attachments.push({filename:receipt.name,contentType:receipt.type || "application/octet-stream",content:await blobToBase64(receipt.blob)});
+        }
+        setStatus("Sending your receipt and delivery details securely…");
+        const response = await fetch("/api/submit",{
           method:"POST",
-          body:formData,
-          headers:{"Accept":"application/json"}
+          headers:{"Content-Type":"application/json","Accept":"application/json"},
+          body:JSON.stringify({
+            account:{name:activeAccount.name,number:activeAccount.number || ""},
+            receiver:{
+              name:document.getElementById("receiver-name").value.trim(),
+              address:document.getElementById("delivery-address").value.trim(),
+              mobile:document.getElementById("receiver-mobile").value.trim(),
+              specialInstructions:document.getElementById("special-instructions").value.trim()
+            },
+            submittedAt:new Date().toISOString(),
+            receipts:attachments
+          })
         });
         let result = {};
-        try{ result = await response.json(); }catch(parseError){}
-        if(!response.ok || result.success === "false" || result.success === false){
-          throw new Error(result.message || "The email service could not accept the submission.");
+        try{result = await response.json();}catch(parseError){}
+        if(!response.ok || result.success !== true){
+          throw new Error(result.error || "Your submission could not be sent. Please try again in a moment.");
         }
-        setStatus("Submitted successfully. Your delivery details and receipt have been sent.");
-        document.getElementById("submit-details-button").textContent = "Submitted";
-        document.getElementById("submit-details-button").disabled = true;
+        setStatus("Submitted successfully. Your receipt and delivery details have been emailed.");
+        button.textContent = "Submitted";
+        button.disabled = true;
         return;
+      }catch(error){
+        setStatus(error && error.message ? error.message : "Could not send your submission. Check your connection and try again.");
+      }finally{
+        if(button.textContent !== "Submitted"){
+          button.disabled = false;
+          button.textContent = "Submit";
+        }
       }
     });
     dialog.addEventListener("close",function(){
