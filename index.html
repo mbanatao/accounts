@@ -53,7 +53,7 @@
     .open-qr{border:1px solid #d7e3d9;background:var(--soft);color:var(--green-dark);border-radius:9px;padding:10px 12px;font-size:11px;font-weight:700;white-space:nowrap}
     .open-qr:hover:not(:disabled){background:#d8ecdf}
     .open-qr:disabled{background:#f5f3ed;border-color:#e8e3d7;color:#857d6d;cursor:not-allowed}
-    .notice{display:flex;align-items:flex-start;gap:12px;padding:17px 18px;margin-top:23px;border-radius:13px;border:1px solid #e7dfcf;background:#fbf8f0;color:#716551;font-size:12px;line-height:1.65}
+    .notice{display:flex;align-items:flex-start;gap:12px;padding:17px 18px;margin-top:23px;border-radius:13px;border:1px solid #e7dfcf;background:#fbf8f0;color:#716551;font-size:12px;line-height:1.65}.modal-alert{margin:17px 0 0;padding:12px 13px;border:1px solid #ead4ac;border-radius:11px;background:#fff6e6;color:#78551b;font-size:11px;line-height:1.65;text-align:left}.modal-alert strong{display:block;color:#624313;margin-bottom:3px}
     .notice svg{flex:0 0 auto;margin-top:1px}
     .notice strong{color:#4f483a}
     .empty{grid-column:1/-1;border:1px dashed #d8ddd4;border-radius:15px;padding:44px 20px;text-align:center;color:var(--muted);font-size:14px}
@@ -134,6 +134,7 @@
       <p class="owner" id="modal-owner"></p>
       <p class="account-number" style="margin-top:16px;text-align:left"><span id="modal-number-label">Account number</span> <strong id="modal-number"></strong></p>
       <p class="account-secondary" id="modal-secondary"></p>
+      <div class="modal-alert" id="modal-alert" hidden><strong>Temporary BDO Pay QR — do not use as a receiving code</strong>The supplied screenshot says “Present this QR to the merchant” and shows a 2:48 validity window. This captured code may already be expired and is for merchant payment, not receiving bank transfers. Generate a fresh code in BDO Pay for a live transaction.</div>
       <div class="qr-frame"><div id="qr-target" aria-label="Scannable payment QR code"></div></div>
       <p class="qr-help">Scan using your bank or wallet app. Verify the recipient name before you confirm payment.</p>
       <div class="modal-actions">
@@ -155,7 +156,7 @@
       {id:"gcash",name:"GCash",mark:"G",category:"wallet",kind:"Wallet",color:"#0873e8",soft:"#e8f2ff",owner:"Mark Johnson",number:"0968 184 1001",numberLabel:"Mobile number",detail:"Mobile wallet QR",suffix:"Mobile ending 1001",payload:"00020101021127830012com.p2pqrpay0111GXCHPHM2XXX02089996440303152170200000006560417DWQM4TK4C473D8NYG5204601653036085802PH5915MA*K JO****N B.6011Barangay 43610412346304A12F"},
       {id:"maya",name:"Maya",mark:"m",category:"wallet",kind:"Wallet",color:"#08a45b",soft:"#e5f7ea",owner:"Mark Johnson",number:"0968 184 1001",numberLabel:"Mobile number",detail:"@mbanatao",suffix:"Mobile ending 1001",payload:"00020101021127780012com.p2pqrpay0111PAPHPHM1XXX02089996440304126396818410010515+63-968-18410015204601653036085802PH5920MARK JOHNSON BANATAO6010Pasay City63045270"},
       {id:"gotyme",name:"GoTyme",mark:"GT",category:"bank",kind:"Digital bank",color:"#242833",soft:"#eeeff2",owner:"Mark Johnson",number:"0165 2125 9769",numberLabel:"Account number",secondaryNumber:"0968 184 1001",secondaryLabel:"Mobile number",detail:"Instapay QR",suffix:"Account ending 9769",payload:"00020101021127590012com.p2pqrpay0111GOTYPHM2XXX02089996440304120165212597695204601653036085802PH5925MARK JOHNSON DELA BANATAO6010Pasay City63042660"},
-      {id:"bdo",name:"BDO",mark:"BDO",category:"bank",kind:"BDO Basic",color:"#1260ac",soft:"#e9f2ff",owner:"Mark Johnson",number:"0073 3600 2118",numberLabel:"Account number",detail:"BDO Pay QR unavailable",suffix:"Account ending 2118",payload:null}
+      {id:"bdo",name:"BDO",mark:"BDO",category:"bank",kind:"BDO Pay",color:"#1260ac",soft:"#e9f2ff",owner:"Mark Johnson",number:"0073 3600 2118",numberLabel:"Account number",detail:"Temporary merchant-payment QR snapshot",suffix:"Expired snapshot · refresh in app",temporary:true,payload:"8505CPV0161184F14A000000055555562845A120073360021185F201000324832299F250421189F2436e778db24-5587-45a9-8bf8-8a6187a35b0663249F251819-10-202620:37:43"}
     ];
     const grid = document.getElementById("grid");
     const search = document.getElementById("search");
@@ -165,13 +166,13 @@
     let activeAccount = null;
 
     function cardMarkup(a){
-      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">Show QR <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">Use account number</button>';
+      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">' + (a.temporary ? "View snapshot" : "Show QR") + ' <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">Use account number</button>';
       const pill = a.payload ? a.kind : '<span class="type-pill alert">QR needs refresh</span>';
-      return '<article class="account-card"><div class="card-top"><div class="bank-mark" style="--brand:' + a.color + ';--brand-soft:' + a.soft + '">' + a.mark + '</div>' + (a.payload ? '<span class="type-pill">' + a.kind + '</span>' : '<span class="type-pill alert">QR unavailable</span>') + '</div><h2>' + a.name + '</h2><p class="owner">' + a.owner + '</p><p class="account-number"><span>' + (a.numberLabel || 'Account number') + '</span><strong>' + (a.number || 'Not provided') + '</strong></p>' + (a.secondaryNumber ? '<p class="account-secondary">' + (a.secondaryLabel || 'Additional detail') + ': ' + a.secondaryNumber + '</p>' : '') + '<div class="account-bottom"><div class="suffix">' + a.suffix + '</div>' + action + '</div></article>';
+      return '<article class="account-card"><div class="card-top"><div class="bank-mark" style="--brand:' + a.color + ';--brand-soft:' + a.soft + '">' + a.mark + '</div>' + (a.temporary ? '<span class="type-pill alert">Temporary · refresh needed</span>' : a.payload ? '<span class="type-pill">' + a.kind + '</span>' : '<span class="type-pill alert">QR unavailable</span>') + '</div><h2>' + a.name + '</h2><p class="owner">' + a.owner + '</p><p class="account-number"><span>' + (a.numberLabel || 'Account number') + '</span><strong>' + (a.number || 'Not provided') + '</strong></p>' + (a.secondaryNumber ? '<p class="account-secondary">' + (a.secondaryLabel || 'Additional detail') + ': ' + a.secondaryNumber + '</p>' : '') + '<div class="account-bottom"><div class="suffix">' + a.suffix + '</div>' + action + '</div></article>';
     }
     function render(){
-      document.getElementById("active-count").textContent = accounts.filter(function(a){return Boolean(a.payload);}).length;
-      document.getElementById("refresh-count").textContent = accounts.filter(function(a){return !a.payload;}).length;
+      document.getElementById("active-count").textContent = accounts.filter(function(a){return Boolean(a.payload) && !a.temporary;}).length;
+      document.getElementById("refresh-count").textContent = accounts.filter(function(a){return !a.payload || a.temporary;}).length;
       const q = search.value.trim().toLowerCase();
       const shown = accounts.filter(function(a){
         const matchesFilter = activeFilter === "all" || a.category === activeFilter;
@@ -194,9 +195,11 @@
       document.getElementById("modal-number-label").textContent = a.numberLabel || "Account number";
       document.getElementById("modal-number").textContent = a.number || "Not provided";
       document.getElementById("modal-secondary").textContent = a.secondaryNumber ? (a.secondaryLabel || "Additional detail") + ": " + a.secondaryNumber : "";
+      document.getElementById("modal-alert").hidden = !a.temporary;
       document.getElementById("qr-target").innerHTML = "";
       document.getElementById("modal-status").textContent = "";
-      document.getElementById("download-qr").disabled = false;
+      document.getElementById("download-qr").disabled = Boolean(a.temporary);
+      document.getElementById("download-qr").textContent = a.temporary ? "Temporary code" : "Download QR";
       if(typeof QRCode === "undefined"){
         document.getElementById("qr-target").innerHTML = '<p class="owner">QR generator could not load. Check your connection and reload the page.</p>';
         document.getElementById("download-qr").disabled = true;
@@ -231,7 +234,7 @@
     });
     document.getElementById("copy-details").addEventListener("click",async function(){
       if(!activeAccount) return;
-      const text = activeAccount.name + " — " + activeAccount.owner + (activeAccount.suffix ? " — " + activeAccount.suffix : "");
+      const text = activeAccount.name + " — " + activeAccount.owner + (activeAccount.number ? " — " + activeAccount.number : "") + (activeAccount.suffix ? " — " + activeAccount.suffix : "");
       try{
         await navigator.clipboard.writeText(text);
         document.getElementById("modal-status").textContent = "Account details copied.";
