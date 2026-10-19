@@ -1,19 +1,23 @@
 # Accounts — Payment Directory
 
-A responsive static site containing the owner's payment QR profiles, with account numbers shown for manual transfers.
+A responsive static site containing the owner's bank and digital-wallet QR profiles, manual transfer details, account-specific notes, and receipt attachments.
 
 ## Profiles
 - UnionBank
-- BPI (account masked as shown in the supplied QR image)
+- BPI — account number 4206071068
 - EastWest
 - Tonik
 - MariBank
 - GCash
 - Maya
 - GoTyme
-- BDO is listed with the supplied account number, but its provided QR screenshot was a short-lived merchant QR and is not displayed as a reusable personal receiving QR.
+- BDO — account number 007336002118; the supplied QR is a temporary merchant-payment code and is clearly labelled as a snapshot, not a reusable receiving QR.
 
-The eight usable QR payloads were decoded from the supplied QR screenshots, retained as the payload data, and validated by their EMVCo CRC checksums before rendering in the browser. Duplicate EastWest images are consolidated into one entry.
+The QR payloads were decoded from the supplied screenshots and CRC-validated before rendering in the browser. The BDO screenshot is a dynamic merchant QR with an on-screen validity countdown. The site warns users not to treat it as a reusable receiving code and disables downloading that snapshot.
+
+## Account notes and receipt attachments
+
+Each account opens its own **Additional details** field and receipt list. Notes are saved in browser local storage, and receipt files are saved in IndexedDB in that browser on that device. Accepted receipt types are JPG/JPEG, PNG, WebP and PDF; maximum five files per account, 10 MB per file. Files can be opened, saved/downloaded, or removed. Receipt data is not uploaded to the website or synchronized between devices. Clearing browser site data may remove these local records.
 
 ## Deployment
 
@@ -25,10 +29,4 @@ This is a direct static deployment under the alternate connected Vercel account 
 
 The repository and website are public. The `noindex,nofollow` tag only discourages search-engine indexing and does not restrict access. Anyone who knows the URL or can read the source can view account details and scan the QR codes.
 
-Senders should verify the recipient and amount in their own bank/wallet app before authorizing payment. The BDO QR screenshot showed a temporary merchant QR with a countdown, so a fresh QR must be generated in BDO Pay when one is actually needed. Never share passwords or OTPs to receive a transfer.
-
-
-## Latest QR update (2026-10-20)
-
-- GoTyme's payload in the page matches the QR content decoded from the latest supplied GoTyme screenshot.
-- BDO's supplied screenshot QR was decoded into a temporary merchant-payment payload and is shown only with a prominent warning; the screenshot states “Present this QR to the merchant” and a 2:48 validity window. The Download QR action is disabled for this entry, because the capture is not a reusable receiving QR and may already be expired.
+Senders should verify the recipient and amount in their own bank/wallet app before authorizing payment. Never share passwords or OTPs to receive a transfer.
