@@ -59,9 +59,9 @@
     .empty{grid-column:1/-1;border:1px dashed #d8ddd4;border-radius:15px;padding:44px 20px;text-align:center;color:var(--muted);font-size:14px}
     footer{border-top:1px solid var(--line);padding:22px 0 35px;display:flex;justify-content:space-between;align-items:center;gap:20px;color:var(--muted);font-size:11px;line-height:1.6}
     footer .foot-brand{font-weight:700;color:#424c44}
-    dialog{width:min(94vw,490px);max-width:490px;border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:0;background:#fff;color:var(--ink);box-shadow:0 30px 120px rgba(0,0,0,.25);overflow:hidden}
+    dialog{width:min(94vw,490px);max-width:490px;max-height:92vh;border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:0;background:#fff;color:var(--ink);box-shadow:0 30px 120px rgba(0,0,0,.25);overflow-y:auto}
     dialog::backdrop{background:rgba(12,22,16,.64);backdrop-filter:blur(5px)}
-    .modal-head{display:flex;justify-content:space-between;align-items:center;padding:22px 24px 16px;border-bottom:1px solid #edf0ea}
+    .modal-head{position:sticky;top:0;z-index:2;background:#fff;display:flex;justify-content:space-between;align-items:center;padding:22px 24px 16px;border-bottom:1px solid #edf0ea}
     .modal-eyebrow{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green)}
     .close{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;display:grid;place-items:center;color:var(--ink)}
     .modal-content{padding:25px 24px 24px;text-align:center}
@@ -76,7 +76,7 @@
     .action{border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px 10px;font-size:12px;font-weight:700;color:var(--ink)}
     .action.primary{background:var(--green);border-color:var(--green);color:#fff}
     .action.primary:hover{background:var(--green-dark)}
-    .status-line{font-size:11px;color:var(--muted);min-height:17px;margin-top:13px}
+    .status-line{font-size:11px;color:var(--muted);min-height:17px;margin-top:13px}.record-panel{margin-top:20px;padding:16px;border:1px solid #e7ebe4;border-radius:14px;text-align:left;background:#fbfcf9}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.panel-heading h3{margin:0;font-family:Manrope,sans-serif;font-size:14px;letter-spacing:-.3px}.panel-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:700}.details-input{width:100%;min-height:90px;resize:vertical;padding:11px 12px;border:1px solid #dfe5dc;background:#fff;border-radius:10px;font:12px/1.6 "DM Sans",sans-serif;color:var(--ink);text-align:left}.local-hint{font-size:10px;color:var(--muted);line-height:1.55;margin:8px 0 0}.receipt-picker{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:1px dashed #b9c9bb;background:#fff;border-radius:10px;color:var(--green-dark);font-size:12px;font-weight:700;cursor:pointer}.receipt-picker:hover{background:#f0f7f1}.receipt-picker input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.receipt-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}.receipt-item{display:flex;gap:10px;align-items:center;padding:10px;background:#fff;border:1px solid #e8ece5;border-radius:10px}.receipt-file-icon{width:34px;height:38px;border-radius:7px;background:#f0f3ed;color:#55705c;display:grid;place-items:center;flex:0 0 auto}.receipt-meta{min-width:0;flex:1}.receipt-name{font-size:11px;font-weight:700;overflow-wrap:anywhere;color:#28352c}.receipt-size{font-size:10px;color:var(--muted);margin-top:3px}.receipt-actions{display:flex;gap:6px;flex-wrap:wrap}.receipt-link,.receipt-remove{border:1px solid #e2e6df;border-radius:7px;background:#fff;padding:7px 8px;font-size:10px;font-weight:700;color:#354438;text-decoration:none;cursor:pointer}.receipt-remove{color:#9b3c35}.receipt-empty{font-size:11px;color:var(--muted);margin:12px 0 0}
     .bdo-detail{background:#f7f6f1;border-radius:14px;padding:18px;text-align:left;font-size:12px;line-height:1.7;color:#62685f;margin:16px 0}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.page{padding:0 26px}main{padding-top:53px}}
     @media(max-width:600px){.page{padding:0 17px}.topbar{height:65px}.top-meta{font-size:10px}main{padding:39px 0 40px}h1{letter-spacing:-2px;margin-top:16px}.intro{font-size:14px}.summary-row{align-items:flex-start;flex-direction:column;margin-top:28px;gap:14px}.search-wrap{width:100%}.toolbar{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr;gap:11px}.account-card{min-height:206px;padding:18px}.account-card h2{margin-top:15px}.account-bottom{padding-top:18px}footer{align-items:flex-start;flex-direction:column;gap:6px;padding-bottom:25px}.modal-content{padding:21px 17px}.qr-frame{width:270px;min-height:270px}.modal-actions{grid-template-columns:1fr 1fr}.modal-head{padding:17px 18px 13px}}
@@ -141,6 +141,8 @@
         <button class="action primary" id="download-qr" type="button">Download QR</button>
         <button class="action" id="copy-details" type="button">Copy details</button>
       </div>
+      <section class="record-panel" aria-labelledby="details-heading"><div class="panel-heading"><h3 id="details-heading">Additional details</h3><span class="panel-tag">Per account</span></div><textarea class="details-input" id="details-input" maxlength="2000" rows="3" placeholder="Add a transfer reference, payment context, or account-specific note…"></textarea><p class="local-hint">Notes are saved in this browser on this device. They are not sent to a server or shared with other devices.</p></section>
+      <section class="record-panel" aria-labelledby="receipt-heading"><div class="panel-heading"><h3 id="receipt-heading">Attach receipt</h3><span class="panel-tag">Up to 5 files · 10 MB each</span></div><label class="receipt-picker"><input id="receipt-input" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple><span>＋ Choose receipt files</span></label><ul id="receipt-list" class="receipt-list" aria-label="Attached receipts"></ul><p id="receipt-empty" class="receipt-empty">No receipts attached to this account yet.</p><p class="local-hint">Receipt files remain in this browser’s local storage. They are not uploaded to this public website.</p></section>
       <div class="status-line" id="modal-status" role="status" aria-live="polite"></div>
     </div>
   </dialog>
@@ -149,7 +151,7 @@
   <script>
     const accounts = [
       {id:"unionbank",name:"UnionBank",mark:"UB",category:"bank",kind:"Bank",color:"#e87516",soft:"#fff0df",owner:"Mark Johnson",number:"1093 3328 2070",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 2070",payload:"00020101021127590012com.p2pqrpay0111UBPHPHMMXXX02089996440304121093332820705204601653036085802PH5925MARK JOHNSON DELA CRUZ BA6004CITY6304D792"},
-      {id:"bpi",name:"BPI",mark:"BPI",category:"bank",kind:"Bank",color:"#d94046",soft:"#ffeded",owner:"Mark Johnson",number:"•••••••••• 068",numberLabel:"Masked account",detail:"Instapay QR",suffix:"•••• 068",payload:"00020101021127610012com.p2pqrpay0111BOPIPHMMXXX0208999644030414000042060710685204601653036085802PH5902MB6011Makati City6304B073"},
+      {id:"bpi",name:"BPI",mark:"BPI",category:"bank",kind:"Bank",color:"#d94046",soft:"#ffeded",owner:"Mark Johnson",number:"4206071068",numberLabel:"Account number",detail:"Instapay QR",suffix:"•••• 068",payload:"00020101021127610012com.p2pqrpay0111BOPIPHMMXXX0208999644030414000042060710685204601653036085802PH5902MB6011Makati City6304B073"},
       {id:"eastwest",name:"EastWest",mark:"EW",category:"bank",kind:"Regular savings",color:"#7b2479",soft:"#f6e9f4",owner:"Mark Johnson",number:"2000 6918 7958",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 7958",payload:"00020101021127590012com.p2pqrpay0111EWBCPHMMXXX02089996440304122000691879585204601653036085802PH5915REGULAR SAVINGS6012METRO MANILA630410D7"},
       {id:"tonik",name:"Tonik",mark:"tn",category:"bank",kind:"Digital bank",color:"#7956ec",soft:"#f0edff",owner:"Mark Johnson",number:"6084 4098 7400 04",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 0004",payload:"00020101021127610012com.p2pqrpay0111TDBIPHM2XXX0208999644030414608440987400045204601653036085802PH5912MARK JOHNSON6010PASAY CITY62480014632715216119820514632715216119820708129370436304D4D9"},
       {id:"maribank",name:"MariBank",mark:"M",category:"bank",kind:"Digital bank",color:"#d66c15",soft:"#fff0df",owner:"Mark Johnson",number:"11386180961",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 0961",payload:"00020101021127580012com.p2pqrpay0111LAUIPHM2XXX0208999644030411113861809615204601653036085802PH5915MARK JOHNSON B.6009Pagsanjan630463B5"},
@@ -164,6 +166,8 @@
     const dialog = document.getElementById("qr-dialog");
     let activeFilter = "all";
     let activeAccount = null;
+    let dbPromise = null;
+    let receiptObjectUrls = [];
 
     function cardMarkup(a){
       const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">' + (a.temporary ? "View snapshot" : "Show QR") + ' <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">Use account number</button>';
@@ -206,6 +210,8 @@
       }else{
         new QRCode(document.getElementById("qr-target"), {text:a.payload,width:270,height:270,colorDark:"#050505",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
       }
+      loadAccountNotes(a);
+      renderReceipts(a.id).catch(function(){ setStatus("Receipt storage is unavailable in this browser."); });
       dialog.showModal();
     }
     filters.forEach(function(button){
@@ -242,6 +248,153 @@
         document.getElementById("modal-status").textContent = "Copy unavailable in this browser. Please note the account name shown above.";
       }
     });
+
+    function setStatus(message){
+      document.getElementById("modal-status").textContent = message;
+    }
+    function notesKey(accountId){ return "accounts-directory-notes:" + accountId; }
+    function loadAccountNotes(account){
+      const field = document.getElementById("details-input");
+      try{ field.value = localStorage.getItem(notesKey(account.id)) || ""; }
+      catch(e){ field.value = ""; setStatus("Local note storage is unavailable in this browser."); }
+    }
+    document.getElementById("details-input").addEventListener("input",function(){
+      if(!activeAccount) return;
+      try{
+        localStorage.setItem(notesKey(activeAccount.id),this.value);
+        setStatus("Additional details saved on this device.");
+      }catch(e){ setStatus("Could not save notes in this browser."); }
+    });
+    function openReceiptDb(){
+      if(dbPromise) return dbPromise;
+      dbPromise = new Promise(function(resolve,reject){
+        if(!("indexedDB" in window)){ reject(new Error("IndexedDB is not supported.")); return; }
+        const request = indexedDB.open("accounts-directory-receipts",1);
+        request.onupgradeneeded = function(){
+          const db = request.result;
+          if(!db.objectStoreNames.contains("receipts")){
+            const store = db.createObjectStore("receipts",{keyPath:"id"});
+            store.createIndex("accountId","accountId",{unique:false});
+          }
+        };
+        request.onsuccess = function(){ resolve(request.result); };
+        request.onerror = function(){ reject(request.error || new Error("Could not open receipt storage.")); };
+      });
+      return dbPromise;
+    }
+    function getReceipts(accountId){
+      return openReceiptDb().then(function(db){
+        return new Promise(function(resolve,reject){
+          const request = db.transaction("receipts","readonly").objectStore("receipts").index("accountId").getAll(accountId);
+          request.onsuccess = function(){ resolve(request.result.sort(function(a,b){return b.createdAt-a.createdAt;})); };
+          request.onerror = function(){ reject(request.error || new Error("Could not load receipts.")); };
+        });
+      });
+    }
+    function saveReceipt(record){
+      return openReceiptDb().then(function(db){
+        return new Promise(function(resolve,reject){
+          const tx = db.transaction("receipts","readwrite");
+          tx.objectStore("receipts").put(record);
+          tx.oncomplete = function(){ resolve(); };
+          tx.onerror = function(){ reject(tx.error || new Error("Could not save receipt.")); };
+          tx.onabort = function(){ reject(tx.error || new Error("Receipt save was cancelled.")); };
+        });
+      });
+    }
+    function deleteReceipt(id){
+      return openReceiptDb().then(function(db){
+        return new Promise(function(resolve,reject){
+          const tx = db.transaction("receipts","readwrite");
+          tx.objectStore("receipts").delete(id);
+          tx.oncomplete = function(){ resolve(); };
+          tx.onerror = function(){ reject(tx.error || new Error("Could not delete receipt.")); };
+        });
+      });
+    }
+    function formatSize(size){
+      return size < 1024*1024 ? Math.max(1,Math.round(size/1024)) + " KB" : (size/(1024*1024)).toFixed(1) + " MB";
+    }
+    async function renderReceipts(accountId){
+      receiptObjectUrls.forEach(function(url){URL.revokeObjectURL(url);});
+      receiptObjectUrls = [];
+      const list = document.getElementById("receipt-list");
+      const empty = document.getElementById("receipt-empty");
+      list.replaceChildren();
+      const receipts = await getReceipts(accountId);
+      empty.hidden = receipts.length > 0;
+      receipts.forEach(function(receipt){
+        const li = document.createElement("li");
+        li.className = "receipt-item";
+        const icon = document.createElement("div");
+        icon.className = "receipt-file-icon";
+        icon.textContent = receipt.type === "application/pdf" ? "PDF" : "IMG";
+        const meta = document.createElement("div");
+        meta.className = "receipt-meta";
+        const name = document.createElement("div");
+        name.className = "receipt-name";
+        name.textContent = receipt.name;
+        const size = document.createElement("div");
+        size.className = "receipt-size";
+        size.textContent = formatSize(receipt.size) + " · " + new Date(receipt.createdAt).toLocaleDateString();
+        meta.append(name,size);
+        const actions = document.createElement("div");
+        actions.className = "receipt-actions";
+        const url = URL.createObjectURL(receipt.blob);
+        receiptObjectUrls.push(url);
+        const view = document.createElement("a");
+        view.className = "receipt-link";
+        view.textContent = "Open";
+        view.href = url;
+        view.target = "_blank";
+        view.rel = "noopener noreferrer";
+        const download = document.createElement("a");
+        download.className = "receipt-link";
+        download.textContent = "Save";
+        download.href = url;
+        download.download = receipt.name;
+        const remove = document.createElement("button");
+        remove.className = "receipt-remove";
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.addEventListener("click",async function(){
+          try{
+            await deleteReceipt(receipt.id);
+            await renderReceipts(accountId);
+            setStatus("Receipt removed from this device.");
+          }catch(e){setStatus("Could not remove this receipt.");}
+        });
+        actions.append(view,download,remove);
+        li.append(icon,meta,actions);
+        list.append(li);
+      });
+    }
+    document.getElementById("receipt-input").addEventListener("change",async function(){
+      const files = Array.from(this.files || []);
+      this.value = "";
+      if(!activeAccount || files.length === 0) return;
+      try{
+        const existing = await getReceipts(activeAccount.id);
+        let room = Math.max(0,5-existing.length);
+        if(room === 0){setStatus("This account already has 5 receipts. Remove one before adding another.");return;}
+        let added=0;
+        for(const file of files){
+          if(room <= 0){setStatus("Receipt limit is 5 files per account; remaining files were skipped.");break;}
+          if(file.size > 10*1024*1024){setStatus(file.name + " exceeds the 10 MB limit and was skipped.");continue;}
+          if(!["image/jpeg","image/png","image/webp","application/pdf"].includes(file.type)){setStatus(file.name + " is not a supported image or PDF.");continue;}
+          const suffix = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+"-"+Math.random().toString(36).slice(2);
+          await saveReceipt({id:activeAccount.id+"-"+suffix,accountId:activeAccount.id,name:file.name,type:file.type,size:file.size,createdAt:Date.now(),blob:file});
+          room--; added++;
+        }
+        await renderReceipts(activeAccount.id);
+        if(added>0) setStatus(added + " receipt file(s) saved on this device for " + activeAccount.name + ".");
+      }catch(e){setStatus("Receipt storage failed. Check browser storage permissions and available space.");}
+    });
+    dialog.addEventListener("close",function(){
+      receiptObjectUrls.forEach(function(url){URL.revokeObjectURL(url);});
+      receiptObjectUrls = [];
+    });
+
     render();
   </script>
 </body>
