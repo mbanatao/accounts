@@ -46,7 +46,7 @@
     .type-pill{font-size:10px;line-height:1;padding:7px 9px;border-radius:99px;background:#f4f5f1;color:#68716a;font-weight:700;white-space:nowrap}
     .type-pill.alert{background:#fff3df;color:#915c10}
     .account-card h2{font-family:Manrope,sans-serif;font-size:18px;letter-spacing:-.55px;margin:20px 0 5px}
-    .owner{font-size:12px;color:var(--muted);margin:0;line-height:1.55}
+    .owner{font-size:12px;color:var(--muted);margin:0;line-height:1.55}.account-number{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin:12px 0 0;padding-top:11px;border-top:1px solid #f0f1ec;font-size:11px;color:var(--muted)}.account-number strong{color:#313a33;font-size:11px;font-weight:700;text-align:right;overflow-wrap:anywhere}.account-secondary{font-size:10px;color:var(--muted);margin:5px 0 0;text-align:right}
     .account-bottom{margin-top:auto;padding-top:21px;display:flex;align-items:center;justify-content:space-between;gap:10px}
     .suffix{font-size:11px;color:var(--muted);letter-spacing:.2px}
     .suffix strong{color:#353d37;font-weight:700}
@@ -95,7 +95,7 @@
       <p class="intro">A single place for bank and wallet QR codes. Choose an account, show the code, and let the sender verify the recipient in their own payment app.</p>
 
       <div class="summary-row">
-        <div class="summary"><strong id="active-count">7</strong> ready-to-scan QR profiles <span aria-hidden="true">·</span> <span id="refresh-count">1</span> needs a fresh code</div>
+        <div class="summary"><strong id="active-count">8</strong> ready-to-scan QR profiles <span aria-hidden="true">·</span> <span id="refresh-count">1</span> needs a fresh code</div>
         <label class="search-wrap">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
           <input class="search" id="search" type="search" placeholder="Search account or bank" aria-label="Search accounts">
@@ -132,6 +132,8 @@
       <div class="modal-brand" id="modal-brand"></div>
       <h2 id="modal-title">Account name</h2>
       <p class="owner" id="modal-owner"></p>
+      <p class="account-number" style="margin-top:16px;text-align:left"><span id="modal-number-label">Account number</span> <strong id="modal-number"></strong></p>
+      <p class="account-secondary" id="modal-secondary"></p>
       <div class="qr-frame"><div id="qr-target" aria-label="Scannable payment QR code"></div></div>
       <p class="qr-help">Scan using your bank or wallet app. Verify the recipient name before you confirm payment.</p>
       <div class="modal-actions">
@@ -145,14 +147,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     const accounts = [
-      {id:"unionbank",name:"UnionBank",mark:"UB",category:"bank",kind:"Bank",color:"#e87516",soft:"#fff0df",owner:"Mark Johnson Dela Cruz Banatao",detail:"Instapay QR",suffix:"Account QR",payload:"00020101021127590012com.p2pqrpay0111UBPHPHMMXXX02089996440304121093332820705204601653036085802PH5925MARK JOHNSON DELA CRUZ BA6004CITY6304D792"},
-      {id:"bpi",name:"BPI",mark:"BPI",category:"bank",kind:"Bank",color:"#d94046",soft:"#ffeded",owner:"MB",detail:"Masked account",suffix:"•••• 068",payload:"00020101021127610012com.p2pqrpay0111BOPIPHMMXXX0208999644030414000042060710685204601653036085802PH5902MB6011Makati City6304B073"},
-      {id:"eastwest",name:"EastWest",mark:"EW",category:"bank",kind:"Regular savings",color:"#7b2479",soft:"#f6e9f4",owner:"Regular Savings",detail:"Instapay QR",suffix:"•••• 7958",payload:"00020101021127590012com.p2pqrpay0111EWBCPHMMXXX02089996440304122000691879585204601653036085802PH5915REGULAR SAVINGS6012METRO MANILA630410D7"},
-      {id:"tonik",name:"Tonik",mark:"tn",category:"bank",kind:"Digital bank",color:"#7956ec",soft:"#f0edff",owner:"Mark Johnson",detail:"Instapay QR",suffix:"•••• 0004",payload:"00020101021127610012com.p2pqrpay0111TDBIPHM2XXX0208999644030414608440987400045204601653036085802PH5912MARK JOHNSON6010PASAY CITY62480014632715216119820514632715216119820708129370436304D4D9"},
-      {id:"maribank",name:"MariBank",mark:"M",category:"bank",kind:"Digital bank",color:"#d66c15",soft:"#fff0df",owner:"Mark Johnson Banatao",detail:"Instapay QR",suffix:"•••• 0961",payload:"00020101021127580012com.p2pqrpay0111LAUIPHM2XXX0208999644030411113861809615204601653036085802PH5915MARK JOHNSON B.6009Pagsanjan630463B5"},
-      {id:"gcash",name:"GCash",mark:"G",category:"wallet",kind:"Wallet",color:"#0873e8",soft:"#e8f2ff",owner:"MA*K J0****N B.",detail:"Mobile wallet QR",suffix:"Mobile ending 1001",payload:"00020101021127830012com.p2pqrpay0111GXCHPHM2XXX02089996440303152170200000006560417DWQM4TK4C473D8NYG5204601653036085802PH5915MA*K JO****N B.6011Barangay 43610412346304A12F"},
-      {id:"maya",name:"Maya",mark:"m",category:"wallet",kind:"Wallet",color:"#08a45b",soft:"#e5f7ea",owner:"Mark Johnson Banatao",detail:"@mbanatao",suffix:"Mobile ending 1001",payload:"00020101021127780012com.p2pqrpay0111PAPHPHM1XXX02089996440304126396818410010515+63-968-18410015204601653036085802PH5920MARK JOHNSON BANATAO6010Pasay City63045270"},
-      {id:"bdo",name:"BDO Pay",mark:"BDO",category:"bank",kind:"BDO Basic",color:"#1260ac",soft:"#e9f2ff",owner:"BDO Basic",detail:"Account ending 2118",suffix:"Refresh required",payload:null}
+      {id:"unionbank",name:"UnionBank",mark:"UB",category:"bank",kind:"Bank",color:"#e87516",soft:"#fff0df",owner:"Mark Johnson",number:"1093 3328 2070",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 2070",payload:"00020101021127590012com.p2pqrpay0111UBPHPHMMXXX02089996440304121093332820705204601653036085802PH5925MARK JOHNSON DELA CRUZ BA6004CITY6304D792"},
+      {id:"bpi",name:"BPI",mark:"BPI",category:"bank",kind:"Bank",color:"#d94046",soft:"#ffeded",owner:"Mark Johnson",number:"•••••••••• 068",numberLabel:"Masked account",detail:"Instapay QR",suffix:"•••• 068",payload:"00020101021127610012com.p2pqrpay0111BOPIPHMMXXX0208999644030414000042060710685204601653036085802PH5902MB6011Makati City6304B073"},
+      {id:"eastwest",name:"EastWest",mark:"EW",category:"bank",kind:"Regular savings",color:"#7b2479",soft:"#f6e9f4",owner:"Mark Johnson",number:"2000 6918 7958",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 7958",payload:"00020101021127590012com.p2pqrpay0111EWBCPHMMXXX02089996440304122000691879585204601653036085802PH5915REGULAR SAVINGS6012METRO MANILA630410D7"},
+      {id:"tonik",name:"Tonik",mark:"tn",category:"bank",kind:"Digital bank",color:"#7956ec",soft:"#f0edff",owner:"Mark Johnson",number:"6084 4098 7400 04",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 0004",payload:"00020101021127610012com.p2pqrpay0111TDBIPHM2XXX0208999644030414608440987400045204601653036085802PH5912MARK JOHNSON6010PASAY CITY62480014632715216119820514632715216119820708129370436304D4D9"},
+      {id:"maribank",name:"MariBank",mark:"M",category:"bank",kind:"Digital bank",color:"#d66c15",soft:"#fff0df",owner:"Mark Johnson",number:"11386180961",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 0961",payload:"00020101021127580012com.p2pqrpay0111LAUIPHM2XXX0208999644030411113861809615204601653036085802PH5915MARK JOHNSON B.6009Pagsanjan630463B5"},
+      {id:"gcash",name:"GCash",mark:"G",category:"wallet",kind:"Wallet",color:"#0873e8",soft:"#e8f2ff",owner:"Mark Johnson",number:"0968 184 1001",numberLabel:"Mobile number",detail:"Mobile wallet QR",suffix:"Mobile ending 1001",payload:"00020101021127830012com.p2pqrpay0111GXCHPHM2XXX02089996440303152170200000006560417DWQM4TK4C473D8NYG5204601653036085802PH5915MA*K JO****N B.6011Barangay 43610412346304A12F"},
+      {id:"maya",name:"Maya",mark:"m",category:"wallet",kind:"Wallet",color:"#08a45b",soft:"#e5f7ea",owner:"Mark Johnson",number:"0968 184 1001",numberLabel:"Mobile number",detail:"@mbanatao",suffix:"Mobile ending 1001",payload:"00020101021127780012com.p2pqrpay0111PAPHPHM1XXX02089996440304126396818410010515+63-968-18410015204601653036085802PH5920MARK JOHNSON BANATAO6010Pasay City63045270"},
+      {id:"gotyme",name:"GoTyme",mark:"GT",category:"bank",kind:"Digital bank",color:"#242833",soft:"#eeeff2",owner:"Mark Johnson",number:"0165 2125 9769",numberLabel:"Account number",secondaryNumber:"0968 184 1001",secondaryLabel:"Mobile number",detail:"Instapay QR",suffix:"Account ending 9769",payload:"00020101021127590012com.p2pqrpay0111GOTYPHM2XXX02089996440304120165212597695204601653036085802PH5925MARK JOHNSON DELA BANATAO6010Pasay City63042660"},
+      {id:"bdo",name:"BDO",mark:"BDO",category:"bank",kind:"BDO Basic",color:"#1260ac",soft:"#e9f2ff",owner:"Mark Johnson",number:"0073 3600 2118",numberLabel:"Account number",detail:"BDO Pay QR unavailable",suffix:"Account ending 2118",payload:null}
     ];
     const grid = document.getElementById("grid");
     const search = document.getElementById("search");
@@ -162,15 +165,17 @@
     let activeAccount = null;
 
     function cardMarkup(a){
-      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">Show QR <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="Refresh QR in BDO Pay">Refresh in app</button>';
+      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">Show QR <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">Use account number</button>';
       const pill = a.payload ? a.kind : '<span class="type-pill alert">QR needs refresh</span>';
-      return '<article class="account-card"><div class="card-top"><div class="bank-mark" style="--brand:' + a.color + ';--brand-soft:' + a.soft + '">' + a.mark + '</div>' + (a.payload ? '<span class="type-pill">' + a.kind + '</span>' : pill) + '</div><h2>' + a.name + '</h2><p class="owner">' + a.owner + '</p><div class="account-bottom"><div class="suffix">' + a.suffix + '</div>' + action + '</div></article>';
+      return '<article class="account-card"><div class="card-top"><div class="bank-mark" style="--brand:' + a.color + ';--brand-soft:' + a.soft + '">' + a.mark + '</div>' + (a.payload ? '<span class="type-pill">' + a.kind + '</span>' : '<span class="type-pill alert">QR unavailable</span>') + '</div><h2>' + a.name + '</h2><p class="owner">' + a.owner + '</p><p class="account-number"><span>' + (a.numberLabel || 'Account number') + '</span><strong>' + (a.number || 'Not provided') + '</strong></p>' + (a.secondaryNumber ? '<p class="account-secondary">' + (a.secondaryLabel || 'Additional detail') + ': ' + a.secondaryNumber + '</p>' : '') + '<div class="account-bottom"><div class="suffix">' + a.suffix + '</div>' + action + '</div></article>';
     }
     function render(){
+      document.getElementById("active-count").textContent = accounts.filter(function(a){return Boolean(a.payload);}).length;
+      document.getElementById("refresh-count").textContent = accounts.filter(function(a){return !a.payload;}).length;
       const q = search.value.trim().toLowerCase();
       const shown = accounts.filter(function(a){
         const matchesFilter = activeFilter === "all" || a.category === activeFilter;
-        const matchesSearch = [a.name,a.owner,a.kind,a.detail,a.suffix].join(" ").toLowerCase().includes(q);
+        const matchesSearch = [a.name,a.owner,a.kind,a.detail,a.suffix,a.number,a.secondaryNumber].join(" ").toLowerCase().includes(q);
         return matchesFilter && matchesSearch;
       });
       grid.innerHTML = shown.length ? shown.map(cardMarkup).join("") : '<div class="empty">No accounts match your search.</div>';
@@ -185,7 +190,10 @@
       document.getElementById("modal-brand").textContent = a.mark;
       document.getElementById("modal-brand").style.cssText = "background:" + a.soft + ";color:" + a.color;
       document.getElementById("modal-title").textContent = a.name;
-      document.getElementById("modal-owner").textContent = a.owner + (a.suffix && a.suffix.includes("••") ? " · " + a.suffix : "");
+      document.getElementById("modal-owner").textContent = a.owner;
+      document.getElementById("modal-number-label").textContent = a.numberLabel || "Account number";
+      document.getElementById("modal-number").textContent = a.number || "Not provided";
+      document.getElementById("modal-secondary").textContent = a.secondaryNumber ? (a.secondaryLabel || "Additional detail") + ": " + a.secondaryNumber : "";
       document.getElementById("qr-target").innerHTML = "";
       document.getElementById("modal-status").textContent = "";
       document.getElementById("download-qr").disabled = false;
