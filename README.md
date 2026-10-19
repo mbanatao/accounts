@@ -1,37 +1,17 @@
 # Accounts — Payment Directory
 
-A responsive static site for the owner's eight bank and digital-wallet QR profiles.
+Production site: https://maccounts.vercel.app
 
-## Profiles
-- UnionBank
-- BPI — account number 4206071068
-- EastWest
-- Tonik
-- MariBank
-- GCash
-- Maya
-- GoTyme
+The directory contains UnionBank, BPI, EastWest, Tonik, MariBank, GCash, Maya and GoTyme. BDO's temporary merchant QR is removed.
 
-BDO has been removed from the directory, including its temporary merchant-payment QR.
+## Receipt and delivery submission
 
-## Logos and customer instructions
+Open a payment QR, enter the receiver's full name, mobile number, complete delivery address and special instructions in the per-account details field, attach the receipt, and choose **Submit details & receipt to Mark**. The current implementation submits the details and file attachments through FormSubmit using a multipart form; the form is limited to 9 MB total attachment size and requires at least one receipt. Saved notes and receipt files are local to that browser until submitted.
 
-Account cards and QR dialogs use bank/wallet logo images, with a fallback mark if an image host is unavailable. Wikimedia Commons logo assets are used where available; official website favicons are used for other brands.
+**Activation required:** FormSubmit may send a one-time activation email to the destination inbox on the first submission. The owner must confirm that email before normal delivery works. FormSubmit is a third-party service and processes submitted delivery details and receipts. Its documentation says it retains submission data for 30 days; uploaded files are not retained in its archive after the email is sent. The email target is configured in the public static HTML/JavaScript source, so it is visible to anyone who inspects the page.
 
-The hero and order checklist instruct the payer to attach the payment receipt and provide the receiver's full name, full delivery address, mobile number, and any special instructions.
+The project is deployed directly to Vercel. GitHub commits do not automatically trigger deployment because this Vercel project is not Git-connected; deploy the static files again after future source changes.
 
-## Additional details and receipts
+## Privacy
 
-Each account has a separate delivery details/special instructions note and receipt attachment list. Notes are saved in browser local storage; receipt files are stored in IndexedDB on the same device. Accepted files: JPG/JPEG, PNG, WebP and PDF. Limits: five files per account, 10 MB each. Files can be opened, downloaded, or removed.
-
-**These records are local to the browser and are not submitted to the account owner or synchronized across devices.** Clearing browser site data may remove them. Customers must send the receipt and details through the owner's existing contact channel. To accept online submissions directly into the owner's account, the site needs an authenticated upload/form backend and a destination such as a verified email, WhatsApp flow, or database; none is configured here.
-
-## Deployment
-
-Production site: https://accounts-barangayoss-projects.vercel.app
-
-This is a direct static deployment under the alternate connected Vercel account because that account does not yet have a GitHub login connection. GitHub commits do **not** automatically deploy updates to this Vercel project; deploy the updated `index.html` again when the site changes, or connect GitHub to the Vercel account to enable automatic deployments.
-
-## Privacy and QR safety
-
-The repository and website are public. The `noindex,nofollow` tag only discourages search-engine indexing and does not restrict access. Anyone with access to the URL or source can view the account numbers and QR codes. Customers should verify the recipient and amount before confirming payment, and never share passwords or OTPs.
+The repository and website are public. `noindex,nofollow` only discourages search-engine indexing and is not access control. Customers should verify account details before payment and must never share passwords or OTPs.
