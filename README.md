@@ -1,21 +1,28 @@
 # Accounts — Payment Directory
 
-A responsive static site for showing the owner's supported Instapay QR codes.
+A responsive static site containing the owner's payment QR profiles, with account numbers shown for manual transfers.
 
-## Included accounts
+## Profiles
 - UnionBank
-- BPI
-- EastWest (duplicate source screenshot consolidated into one entry)
+- BPI (account masked as shown in the supplied QR image)
+- EastWest
 - Tonik
 - MariBank
 - GCash
 - Maya
-- BDO Pay / BDO Basic is listed as needing a refresh, but its temporary QR is intentionally not shown.
+- GoTyme
+- BDO is listed with the supplied account number, but its provided QR screenshot was a short-lived merchant QR and is not displayed as a reusable personal receiving QR.
+
+The eight usable QR payloads were decoded from the supplied QR screenshots, retained as the payload data, and validated by their EMVCo CRC checksums before rendering in the browser. Duplicate EastWest images are consolidated into one entry.
 
 ## Deployment
-The site is a static `index.html` file and can be deployed from the repository root on Vercel with no build command.
 
-## Important QR handling
-The QR payloads for the seven usable, static profiles are embedded in `index.html` and rendered in the browser. The BDO screenshot contained a short-lived merchant QR, which can expire and should be freshly generated from BDO Pay before use. Do not add a stale dynamic QR as a reusable profile.
+Production site: https://accounts-barangayoss-projects.vercel.app
 
-The site uses `noindex,nofollow` to discourage search-engine indexing. This is not access control: the repository and the deployed site are public, and anyone with the site link can view and scan the displayed codes. Transfer senders should verify recipient details in their own bank or wallet app.
+This is a direct static deployment under the alternate connected Vercel account because that account does not yet have a GitHub login connection. GitHub commits do **not** automatically deploy updates to this Vercel project; deploy the updated `index.html` again when the site changes, or connect GitHub to the Vercel account to enable automatic deployments.
+
+## Privacy and QR safety
+
+The repository and website are public. The `noindex,nofollow` tag only discourages search-engine indexing and does not restrict access. Anyone who knows the URL or can read the source can view account details and scan the QR codes.
+
+Senders should verify the recipient and amount in their own bank/wallet app before authorizing payment. The BDO QR screenshot showed a temporary merchant QR with a countdown, so a fresh QR must be generated in BDO Pay when one is actually needed. Never share passwords or OTPs to receive a transfer.
