@@ -88,6 +88,7 @@
     .success-account{font-size:12px;font-weight:700;color:var(--ink);background:#f5f6f1;border:1px solid #e6e9e1;border-radius:10px;padding:11px 14px;max-width:100%;overflow-wrap:anywhere}
     .success-cleanup{font-size:11px;line-height:1.6;color:var(--muted);max-width:330px;margin:8px auto 22px}
     .success-view .submit-details-button{margin-top:8px}
+    .no-qr-label{display:inline-flex;align-items:center;border:1px solid #e2e6df;border-radius:8px;padding:8px 10px;font-size:10px;line-height:1.3;font-weight:700;color:var(--muted);background:#f7f8f4}
     @media(max-width:600px){.success-view{min-height:52vh;padding-top:25px}.success-view h2{font-size:25px}}.local-hint{font-size:10px;color:var(--muted);line-height:1.55;margin:8px 0 0}.receipt-picker{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:1px dashed #b9c9bb;background:#fff;border-radius:10px;color:var(--green-dark);font-size:12px;font-weight:700;cursor:pointer}.receipt-picker:hover{background:#f0f7f1}.receipt-picker input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.receipt-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}.receipt-item{display:flex;gap:10px;align-items:center;padding:10px;background:#fff;border:1px solid #e8ece5;border-radius:10px}.receipt-file-icon{width:34px;height:38px;border-radius:7px;background:#f0f3ed;color:#55705c;display:grid;place-items:center;flex:0 0 auto}.receipt-meta{min-width:0;flex:1}.receipt-name{font-size:11px;font-weight:700;overflow-wrap:anywhere;color:#28352c}.receipt-size{font-size:10px;color:var(--muted);margin-top:3px}.receipt-actions{display:flex;gap:6px;flex-wrap:wrap}.receipt-link,.receipt-remove{border:1px solid #e2e6df;border-radius:7px;background:#fff;padding:7px 8px;font-size:10px;font-weight:700;color:#354438;text-decoration:none;cursor:pointer}.receipt-remove{color:#9b3c35}.receipt-empty{font-size:11px;color:var(--muted);margin:12px 0 0}.submit-details-button{width:100%;border:1px solid var(--green);border-radius:11px;background:var(--green);color:#fff;padding:15px 16px;font-weight:700;font-size:13px;margin-top:18px}.submit-details-button:hover{background:var(--green-dark)}.submit-details-button:disabled{opacity:.65;cursor:wait}.submit-consent{font-size:10px;color:var(--muted);line-height:1.6;text-align:left;margin:9px 0 0}
     .bdo-detail{background:#f7f6f1;border-radius:14px;padding:18px;text-align:left;font-size:12px;line-height:1.7;color:#62685f;margin:16px 0}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.page{padding:0 26px}main{padding-top:53px}}
@@ -178,6 +179,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     const accounts = [
+      {id:"bdo",name:"BDO",mark:"BDO",category:"bank",kind:"Bank",color:"#0755a0",soft:"#eaf1fb",owner:"Mark Johnson",number:"007336002118",numberLabel:"Account number",detail:"Bank transfer",suffix:"Account ending 2118",qrExpected:false},
       {id:"unionbank",name:"UnionBank",mark:"UB",category:"bank",kind:"Bank",color:"#e87516",soft:"#fff0df",owner:"Mark Johnson",number:"1093 3328 2070",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 2070",payload:"00020101021127590012com.p2pqrpay0111UBPHPHMMXXX02089996440304121093332820705204601653036085802PH5925MARK JOHNSON DELA CRUZ BA6004CITY6304D792"},
       {id:"bpi",name:"BPI",mark:"BPI",category:"bank",kind:"Bank",color:"#d94046",soft:"#ffeded",owner:"Mark Johnson",number:"4206071068",numberLabel:"Account number",detail:"Instapay QR",suffix:"•••• 068",payload:"00020101021127610012com.p2pqrpay0111BOPIPHMMXXX0208999644030414000042060710685204601653036085802PH5902MB6011Makati City6304B073"},
       {id:"eastwest",name:"EastWest",mark:"EW",category:"bank",kind:"Regular savings",color:"#7b2479",soft:"#f6e9f4",owner:"Mark Johnson",number:"2000 6918 7958",numberLabel:"Account number",detail:"Instapay QR",suffix:"Account ending 7958",payload:"00020101021127590012com.p2pqrpay0111EWBCPHMMXXX02089996440304122000691879585204601653036085802PH5915REGULAR SAVINGS6012METRO MANILA630410D7"},
@@ -188,6 +190,7 @@
       {id:"gotyme",name:"GoTyme",mark:"GT",category:"bank",kind:"Digital bank",color:"#242833",soft:"#eeeff2",owner:"Mark Johnson",number:"0165 2125 9769",numberLabel:"Account number",secondaryNumber:"0968 184 1001",secondaryLabel:"Mobile number",detail:"Instapay QR",suffix:"Account ending 9769",payload:"00020101021127590012com.p2pqrpay0111GOTYPHM2XXX02089996440304120165212597695204601653036085802PH5925MARK JOHNSON DELA BANATAO6010Pasay City63042660"}
     ];
     const bankLogos = {
+      bdo:"https://www.google.com/s2/favicons?domain=bdo.com.ph&sz=128",
       unionbank:"https://commons.wikimedia.org/wiki/Special:FilePath/UnionBank_PH_logo.svg",
       bpi:"https://www.google.com/s2/favicons?domain=bpi.com.ph&sz=128",
       eastwest:"https://commons.wikimedia.org/wiki/Special:FilePath/EastWest_Bank_2011_h-pos_logo.svg",
@@ -207,12 +210,12 @@
     let receiptObjectUrls = [];
 
     function cardMarkup(a){
-      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">Show QR <span aria-hidden="true">↗</span></button>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">QR unavailable</button>';
+      const action = a.payload ? '<button class="open-qr" type="button" data-open="' + a.id + '">Show QR <span aria-hidden="true">↗</span></button>' : (a.qrExpected === false ? '<span class="no-qr-label">Account details only</span>' : '<button class="open-qr" type="button" disabled aria-label="QR unavailable for this account">QR unavailable</button>');
       return '<article class="account-card"><div class="card-top"><div class="bank-mark" style="--brand:' + a.color + ';--brand-soft:' + a.soft + '"><img class="bank-logo" src="' + bankLogos[a.id] + '" alt="' + a.name + ' logo" loading="lazy" referrerpolicy="no-referrer"><span class="bank-fallback" hidden>' + a.mark + '</span></div><span class="type-pill">' + a.kind + '</span></div><h2>' + a.name + '</h2><p class="owner">' + a.owner + '</p><p class="account-number"><span>' + (a.numberLabel || 'Account number') + '</span><strong>' + (a.number || 'Not provided') + '</strong></p>' + (a.secondaryNumber ? '<p class="account-secondary">' + (a.secondaryLabel || 'Additional detail') + ': ' + a.secondaryNumber + '</p>' : '') + '<div class="account-bottom"><div class="suffix">' + a.suffix + '</div>' + action + '</div></article>';
     }
     function render(){
       document.getElementById("active-count").textContent = accounts.filter(function(a){return Boolean(a.payload);}).length;
-      document.getElementById("refresh-count").textContent = accounts.filter(function(a){return !a.payload;}).length;
+      document.getElementById("refresh-count").textContent = accounts.filter(function(a){return a.qrExpected !== false && !a.payload;}).length;
       const q = search.value.trim().toLowerCase();
       const shown = accounts.filter(function(a){
         const matchesFilter = activeFilter === "all" || a.category === activeFilter;
